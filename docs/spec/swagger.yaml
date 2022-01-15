@@ -1,0 +1,1149 @@
+swagger: '2.0'
+
+info:
+  title: 'Payments Service'
+  version: '1.0.0'
+  description: 'Payments Service, internal to Thermeon'
+  license:
+    name: 'Copyright 2017 Thermeon Worldwide'
+  termsOfService: 'http://thermeon.com/terms.html'
+  contact:
+    name: 'Technical Team'
+    email: 'devel@thermeon.com'
+    url: 'https://www.github.com/thermeon/payments-service/issues'
+
+# Ensure the base path contains the major version of this specification
+basePath: /v0
+
+# Schemes: internal services only need to handle HTTP
+schemes:
+  - http
+
+consumes:
+  - application/json
+
+produces:
+  - application/json
+
+paths:
+# API endpoints
+  '/transaction/{transaction_id}':
+    get:
+      operationId: RetrieveTransaction
+      description: Returns the transaction matching the transaction_id
+      parameters:
+        - name: transaction_id
+          type: string
+          in: path
+          description: Transaction ID
+          required: true
+      responses:
+        200:
+          description: Transaction found and retrieved
+          schema:
+            $ref: '#/definitions/Transaction'
+        400:
+          description: "Bad Request"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Not Found"
+        default:
+          description: "generic error response"
+          schema:
+            $ref: "#/definitions/Error"
+      security:
+        - payments_auth:
+            - "read:transaction"
+    delete:
+      operationId: AbortTransaction
+      description: Aborts transaction matching the transaction_id as long as it is not yet complete
+      parameters:
+        - name: transaction_id
+          type: string
+          in: path
+          description: Transaction ID
+          required: true
+      responses:
+        200:
+          description: "OK"
+        400:
+          description: "Bad Request"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Not Found"
+        405:
+          description: "Not allowed"
+        default:
+          description: "generic error response"
+          schema:
+            $ref: "#/definitions/Error"
+      security:
+        - payments_auth:
+            - "write:transaction"
+
+  '/transaction/{transaction_id}/history':
+    get:
+      operationId: RetrieveTransactionHistory
+      description: Returns the history of the transaction matching the transaction_id
+      parameters:
+        - name: transaction_id
+          type: string
+          in: path
+          description: Transaction ID
+          required: true
+      responses:
+        200:
+          description: Transaction found and retrieved
+          schema:
+            $ref: '#/definitions/TransactionHistory'
+        400:
+          description: "Bad Request"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Not Found"
+        default:
+          description: "generic error response"
+          schema:
+            $ref: "#/definitions/Error"
+      security:
+        - payments_auth:
+            - "read:transaction"
+
+  '/transaction/auth':
+    post:
+      operationId: AuthorizationTransaction
+      description: Requests AUTH for a specified amount, if txnRef is present this will be incremental
+      parameters:
+        - $ref: '#/parameters/RequestCreate'
+      responses:
+        201:
+          description: "successful operation"
+          headers:
+            location:
+              description: "location of the created resource"
+              type: string
+        400:
+          description: "Bad Request"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Not Found"
+        default:
+          description: "generic error response"
+          schema:
+            $ref: "#/definitions/Error"
+      security:
+        - payments_auth:
+          - "write:transaction"
+
+  '/transaction/void':
+    post:
+      operationId: VoidTransaction
+      description: Requests prior authorisation be VOID for a specified amount, this may be up to the value of the AUTH
+      parameters:
+        - $ref: '#/parameters/RequestModify'
+      responses:
+        201:
+          description: "successful operation"
+          headers:
+            location:
+              description: "location of the created resource"
+              type: string
+        400:
+          description: "Bad Request"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Not Found"
+        default:
+          description: "generic error response"
+          schema:
+            $ref: "#/definitions/Error"
+      security:
+        - payments_auth:
+          - "write:transaction"
+
+  '/transaction/capture':
+    post:
+      operationId: CaptureTransaction
+      description: Requests prior authorisation be CAPTUREd for a specified amount, this may be up to the value of the AUTH
+      parameters:
+        - $ref: '#/parameters/RequestModify'
+      responses:
+        201:
+          description: "successful operation"
+          headers:
+            location:
+              description: "location of the created resource"
+              type: string
+        400:
+          description: "Bad Request"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Not Found"
+        default:
+          description: "generic error response"
+          schema:
+            $ref: "#/definitions/Error"
+      security:
+        - payments_auth:
+          - "write:transaction"
+
+  '/transaction/sale':
+    post:
+      operationId: SaleTransaction
+      description: AUTH and CAPTURE in a single operation
+      parameters:
+        - $ref: '#/parameters/RequestCreate'
+      responses:
+        201:
+          description: "successful operation"
+          headers:
+            location:
+              description: "location of the created resource"
+              type: string
+        400:
+          description: "Bad Request"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Not Found"
+        default:
+          description: "generic error response"
+          schema:
+            $ref: "#/definitions/Error"
+      security:
+        - payments_auth:
+          - "write:transaction"
+
+  '/transaction/refund':
+    post:
+      operationId: RefundTransaction
+      description: Requests prior CAPTURE be REFUNDed for a specified amount, this may be up to the value of the CAPTURE
+      parameters:
+        - $ref: '#/parameters/RequestCreate'
+      responses:
+        201:
+          description: "successful operation"
+          headers:
+            location:
+              description: "location of the created resource"
+              type: string
+        400:
+          description: "Bad Request"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Not Found"
+        default:
+          description: "generic error response"
+          schema:
+            $ref: "#/definitions/Error"
+      security:
+        - payments_auth:
+          - "write:transaction"
+
+  '/card/tokenize':
+    post:
+      operationId: TokenizeCard
+      description: Request that a card be processed and tokenized
+      parameters:
+        - $ref: '#/parameters/RequestTokenize'
+      responses:
+        201:
+          description: "successful operation"
+          headers:
+            location:
+              description: "created resource"
+              type: string
+        400:
+          description: "Bad Request"
+        401:
+          description: "Unauthorized"
+        default:
+          description: "generic error response"
+          schema:
+            $ref: "#/definitions/Error"
+      security:
+        - payments_auth:
+          - "write:transaction"
+
+  '/card/option':
+    post:
+      operationId: ChooseOption
+      description: Request that a card be processed and tokenized
+      parameters:
+        - $ref: '#/parameters/RequestOption'
+      responses:
+        201:
+          description: "successful operation"
+          headers:
+            location:
+              description: "created resource"
+              type: string
+        400:
+          description: "Bad Request"
+        401:
+          description: "Unauthorized"
+        default:
+          description: "generic error response"
+          schema:
+            $ref: "#/definitions/Error"
+      security:
+        - payments_auth:
+          - "write:transaction"
+
+  '/lane/{processor}/{lane_id}':
+    get:
+      operationId: GetLane
+      description: Retrieve a configured lane
+      parameters:
+        - name: processor
+          type: string
+          in: path
+          description: Payment Processor
+          required: true
+        - name: lane_id
+          type: string
+          in: path
+          description: Lane ID
+          required: true
+      responses:
+        200:
+          description: Lane retrieved
+          schema:
+            $ref: '#/definitions/Lane'
+        400:
+          description: "Bad Request"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Not Found"
+        default:
+          description: "generic error response"
+          schema:
+            $ref: "#/definitions/Error"
+      security:
+        - payments_auth:
+            - "read:lane"
+    delete:
+      operationId: DeleteLane
+      description: Delete a configured lane
+      parameters:
+        - name: processor
+          type: string
+          in: path
+          description: Payment Processor
+          required: true
+        - name: lane_id
+          type: string
+          in: path
+          description: Lane ID
+          required: true
+      responses:
+        201:
+          description: Lane deleted
+        400:
+          description: "Bad Request"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Not Found"
+        default:
+          description: "generic error response"
+          schema:
+            $ref: "#/definitions/Error"
+      security:
+        - payments_auth:
+            - "read:lane"
+
+  '/lane':
+    post:
+      operationId: CreateLane
+      description: Create a new Lane for a physical device
+      parameters:
+        - $ref: '#/parameters/RequestCreateLane'
+      responses:
+        201:
+          description: "successful operation"
+          headers:
+            location:
+              description: "created resource"
+              type: string
+        400:
+          description: "Bad Request"
+        401:
+          description: "Unauthorized"
+        default:
+          description: "generic error response"
+          schema:
+            $ref: "#/definitions/Error"
+      security:
+        - payments_auth:
+            - "write:lane"
+
+  '/lanes/{processor}/{location}':
+    get:
+      operationId: GetLanes
+      description: Retrieve collection of all configured lanes
+      parameters:
+          - name: processor
+            type: string
+            in: path
+            description: Payment Processor
+            required: true
+          - name: location
+            type: string
+            in: path
+            description: Location
+            required: true
+      responses:
+        200:
+          description: Lanes retrieved
+          schema:
+            $ref: '#/definitions/Lanes'
+        400:
+          description: "Bad Request"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Not Found"
+        default:
+          description: "generic error response"
+          schema:
+            $ref: "#/definitions/Error"
+      security:
+        - payments_auth:
+            - "read:lane"
+
+securityDefinitions:
+  payments_auth:
+    type: "oauth2"
+    authorizationUrl: "https://auth.thermeon.io/oauth/dialog"
+    flow: "implicit"
+    scopes:
+      read:transaction: "read transaction record"
+      write:transaction: "write a transaction"
+      read:lane: "read transaction record"
+      write:lane: "write a transaction"
+
+parameters:
+  # ----------------------------------------------------------------
+  # Request Parameter Schema
+  # ----------------------------------------------------------------
+
+  # RequestCreate
+  RequestCreate:
+    in: body
+    name: RequestCreate
+    required: true
+    schema:
+      $ref: '#/definitions/Create'
+
+  # RequestModify
+  RequestModify:
+    in: body
+    name: RequestModify
+    required: true
+    schema:
+      $ref: '#/definitions/Modify'
+
+  # RequestTokenize
+  RequestTokenize:
+    in: body
+    name: RequestTokenize
+    required: true
+    schema:
+      $ref: '#/definitions/Tokenize'
+
+  # RequestOption
+  RequestOption:
+    in: body
+    name: RequestOption
+    required: true
+    schema:
+      $ref: '#/definitions/Choice'
+
+  # RequestCreateLane
+  RequestCreateLane:
+    in: body
+    name: RequestCreateLane
+    required: true
+    schema:
+      $ref: '#/definitions/LaneRequest'
+
+definitions:
+  # ----------------------------------------------------------------
+  # Response Schema
+  # ----------------------------------------------------------------
+
+  # Schema for error response body
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    required:
+      - code
+      - message
+
+  # Create request
+  Create:
+    type: object
+    properties:
+      txnRef:
+        $ref: '#/definitions/TxnReference'
+      amount:
+        $ref: '#/definitions/Amount'
+      currency:
+        $ref: '#/definitions/Currency'
+      merchName:
+        $ref: '#/definitions/MerchantName'
+      merchNumber:
+        $ref: '#/definitions/MerchantNumber'
+      merchRef:
+        $ref: '#/definitions/MerchantRef'
+      merchRefType:
+        $ref: '#/definitions/MerchantRefType'
+      merchUser:
+        $ref: '#/definitions/MerchantUser'
+      # Rebill token
+      rebillToken:
+        $ref: '#/definitions/RebillToken'
+      # Rental Detail
+      rentalDetail:
+        $ref: '#/definitions/RentalDetail'
+      # POS detail
+      location:
+        $ref: '#/definitions/Location'
+      deviceId:
+        $ref: '#/definitions/DeviceId'
+      posId:
+        $ref: '#/definitions/POSId'
+    required:
+      - amount
+      - currency
+
+  # Modify request
+  Modify:
+    type: object
+    properties:
+      txnRef:
+        $ref: '#/definitions/TxnReference'
+      amount:
+        $ref: '#/definitions/Amount'
+      currency:
+        $ref: '#/definitions/Currency'
+      merchName:
+        $ref: '#/definitions/MerchantName'
+      merchNumber:
+        $ref: '#/definitions/MerchantNumber'
+      merchRef:
+        $ref: '#/definitions/MerchantRef'
+      merchRefType:
+        $ref: '#/definitions/MerchantRefType'
+      merchUser:
+        $ref: '#/definitions/MerchantUser'
+      # Rental Detail
+      rentalDetail:
+        $ref: '#/definitions/RentalDetail'
+      # POS detail
+      location:
+        $ref: '#/definitions/Location'
+      deviceId:
+        $ref: '#/definitions/DeviceId'
+      posId:
+        $ref: '#/definitions/POSId'
+    required:
+      - txnRef
+      - amount
+      - currency
+
+  # Tokenize card request
+  Tokenize:
+    type: object
+    properties:
+      currency:
+        $ref: '#/definitions/Currency'
+      merchName:
+        $ref: '#/definitions/MerchantName'
+      merchNumber:
+        $ref: '#/definitions/MerchantNumber'
+      merchRef:
+        $ref: '#/definitions/MerchantRef'
+      merchRefType:
+        $ref: '#/definitions/MerchantRefType'
+      merchUser:
+        $ref: '#/definitions/MerchantUser'
+      location:
+        $ref: '#/definitions/Location'
+      deviceId:
+        $ref: '#/definitions/DeviceId'
+      posId:
+        $ref: '#/definitions/POSId'
+      ccNumber:
+        $ref: '#/definitions/CCNumber'
+      ccType:
+        $ref: '#/definitions/CCType'
+      ccHolderName:
+        $ref: '#/definitions/CCHolderName'
+      ccExpire:
+        $ref: '#/definitions/CCExpire'
+      ccStart:
+        $ref: '#/definitions/CCStart'
+      ccIssue:
+        $ref: '#/definitions/CCIssue'
+      ccCvc:
+        $ref: '#/definitions/CCCvc'
+      ccCvcPresence:
+        $ref: '#/definitions/CCCvcPresence'
+    required:
+      - location
+      - deviceId
+      - posId
+
+  # Choice request
+  Choice:
+    type: object
+    properties:
+      txnRef:
+        $ref: '#/definitions/TxnReference'
+      option:
+        $ref: '#/definitions/Option'
+      merchUser:
+        $ref: '#/definitions/MerchantUser'
+      location:
+        $ref: '#/definitions/Location'
+      deviceId:
+        $ref: '#/definitions/DeviceId'
+      posId:
+        $ref: '#/definitions/POSId'
+    required:
+      - location
+      - deviceId
+      - posId
+
+  # Lane detail
+  LaneRequest:
+    type: object
+    properties:
+      processor:
+        $ref: '#/definitions/TxnProcessor'
+      location:
+        $ref: '#/definitions/Location'
+      laneId:
+        $ref: '#/definitions/LaneId'
+      deviceId:
+        $ref: '#/definitions/DeviceId'
+      deviceDescription:
+        $ref: '#/definitions/DeviceDescription'
+      activationCode:
+        $ref: '#/definitions/DeviceActivationCode'
+
+  Lane:
+    type: object
+    properties:
+      processor:
+        $ref: '#/definitions/TxnProcessor'
+      laneId:
+        $ref: '#/definitions/LaneId'
+      deviceId:
+        $ref: '#/definitions/DeviceId'
+      deviceSerial:
+        $ref: '#/definitions/DeviceSerial'
+      deviceModel:
+        $ref: '#/definitions/DeviceModel'
+      deviceDescription:
+        $ref: '#/definitions/DeviceDescription'
+      deviceIdleMessage:
+        $ref: '#/definitions/DeviceIdleMessage'
+
+  Lanes:
+    type: array
+    items:
+      $ref: '#/definitions/Lane'
+
+  # ----------------------------------------------------------------
+  # Core Entities
+  # ----------------------------------------------------------------
+
+  # Transaction object, contains all possible transaction attributes
+  Transaction:
+    type: object
+    properties:
+      # transaction detail
+      txnRef:
+        $ref: '#/definitions/TxnReference'
+      txnRefParent:
+        $ref: '#/definitions/TxnReference'
+      txnType:
+        $ref: '#/definitions/TxnType'
+      txnComplete:
+        $ref: '#/definitions/TxnComplete'
+      txnProcessor:
+        $ref: '#/definitions/TxnProcessor'
+      txnRefExt:
+        $ref: '#/definitions/TxnReferenceExternal'
+      txnDate:
+        $ref: '#/definitions/TxnDate'
+      amount:
+        $ref: '#/definitions/Amount'
+      currency:
+        $ref: '#/definitions/Currency'
+      dccAmount:
+        $ref: '#/definitions/Amount'
+      dccCurrency:
+        $ref: '#/definitions/Currency'
+      dccConversionRate:
+        $ref: '#/definitions/ConversionRate'
+      dccMarkup:
+        $ref: '#/definitions/Amount'
+      dccCommission:
+        $ref: '#/definitions/Amount'
+      merchName:
+        $ref: '#/definitions/MerchantName'
+      merchNumber:
+        $ref: '#/definitions/MerchantNumber'
+      merchRef:
+        $ref: '#/definitions/MerchantRef'
+      merchRefType:
+        $ref: '#/definitions/MerchantRefType'
+      merchUser:
+        $ref: '#/definitions/MerchantUser'
+      # authorisation detail
+      authCode:
+        $ref: '#/definitions/AuthCode'
+      authorized:
+        $ref: '#/definitions/Authorized'
+      ccCvcResCode:
+        $ref: '#/definitions/CCCvcResultCode'
+      settleDate:
+        $ref: '#/definitions/SettleDate'
+      helpText:
+        $ref: '#/definitions/HelpText'
+      optLines:
+        type: array
+        items:
+          $ref: '#/definitions/OptionLine'
+      options:
+        type: array
+        items:
+          $ref: '#/definitions/Option'
+      receiptText:
+        $ref: '#/definitions/ReceiptText'
+      receiptWidth:
+        $ref: '#/definitions/ReceiptWidth'
+      respCode:
+        $ref: '#/definitions/ResponseCode'
+      respText:
+        $ref: '#/definitions/ResponseText'
+      # credit card detail
+      rebillToken:
+        $ref: '#/definitions/RebillToken'
+      ccNumber:
+        $ref: '#/definitions/CCNumber'
+      ccType:
+        $ref: '#/definitions/CCType'
+      ccHolderName:
+        $ref: '#/definitions/CCHolderName'
+      ccExpire:
+        $ref: '#/definitions/CCExpire'
+      ccStart:
+        $ref: '#/definitions/CCStart'
+      ccIssue:
+        $ref: '#/definitions/CCIssue'
+      ccCvc:
+        $ref: '#/definitions/CCCvc'
+      ccCvcPresence:
+        $ref: '#/definitions/CCCvcPresence'
+      # POS detail
+      deviceId:
+        $ref: '#/definitions/DeviceId'
+      location:
+        $ref: '#/definitions/Location'
+      posId:
+        $ref: '#/definitions/POSId'
+    required:
+      - txnRef
+      - txnType
+      - txnComplete
+      - txnProcessor
+      - txnDate
+      - amount
+      - currency
+
+  TransactionHistory:
+    type: object
+    properties:
+      txnRef:
+        $ref: '#/definitions/TxnReference'
+      txnRefParent:
+        $ref: '#/definitions/TxnReference'
+      txnType:
+        $ref: '#/definitions/TxnType'
+      txnHistory:
+        type: array
+        items:
+          type: object
+      events:
+        type: array
+        items:
+          $ref: '#/definitions/Event'
+
+  Event:
+    type: object
+    properties:
+      eventId:
+        $ref: '#/definitions/EventID'
+      stamp:
+        $ref: '#/definitions/TxnDate'
+      meta:
+        type: string
+      description:
+        type: string
+
+  RentalDetail:
+    type: object
+    properties:
+      customerName:
+        type: string
+      raNumber:
+        type: string
+      vehicleClassCode:
+        type: string
+      noShowIndicator:
+        type: string
+      adjustmentData:
+        $ref: '#/definitions/AdjustmentData'
+      pickupData:
+        $ref: '#/definitions/PickupData'
+      returnData:
+        $ref: '#/definitions/ReturnData'
+      dailyRate:
+        $ref: '#/definitions/Amount'
+      weeklyRate:
+        $ref: '#/definitions/Amount'
+      insuranceCharges:
+        $ref: '#/definitions/Amount'
+      duration:
+        type: integer
+        minimum: 0
+        exclusiveMinimum: true
+        description: 'Whole number of days for the rental'
+
+  AdjustmentData:
+    type: object
+    properties:
+      amount:
+        $ref: '#/definitions/Amount'
+      code:
+        type: string
+        description: 'Adjustment code'
+      detail:
+        type: array
+        items:
+          type: string
+
+  PickupData:
+    type: object
+    properties:
+      city:
+        type: string
+      countryCode:
+        type: string
+      date:
+        type: string
+        format: date-time
+        description: 'pickup date, notation as per RFC 3339'
+        example: '2017-07-21T15:04:05Z'
+        x-nullable: false
+      location:
+        type: string
+        description: 'store location code'
+      state:
+        type: string
+
+  ReturnData:
+    type: object
+    properties:
+      city:
+        type: string
+      countryCode:
+        type: string
+      date:
+        type: string
+        format: date-time
+        description: 'pickup date, notation as per RFC 3339'
+        example: '2017-07-21T15:04:05Z'
+        x-nullable: false
+      location:
+        type: string
+        description: 'store location code'
+      state:
+        type: string
+      distance:
+        type: integer
+        minimum: 0
+        description: 'whole units travelled'
+        x-nullable: false
+      distanceUnit:
+        type: string
+        enum: ['m', 'km']
+        description: >
+          Unit used for `distance`:
+            * m - miles
+            * km - kilometres
+
+  # ----------------------------------------------------------------
+  # Basic Types
+  # ----------------------------------------------------------------
+
+  Amount:
+    type: number
+    format: float
+    minimum: 0
+    exclusiveMinimum: true
+    description: 'A monetary amount'
+    example: 12.34
+  AuthCode:
+    type: string
+    minLength: 1
+    maxLength: 30
+    description: 'Authorization response code as returned by the issuing bank'
+    example: '987012'
+  Authorized:
+    type: boolean
+    description: 'Authorization from the bank approved'
+    example: true
+  CCCvc:
+    type: string
+    minLength: 3
+    maxLength: 4
+    description: 'Credit card verification code'
+    example: "432"
+  CCCvcPresence:
+    type: integer
+    enum: [0, 1, 2, 9]
+    description: >
+      Declaration of CVC presence:
+        * 0: Merchant chose not to submit
+        * 1: Merchant has included CVC
+        * 2: Card holder states CVC illegible
+        * 9: Card holder states CVC not present
+  CCCvcResultCode:
+    type: string
+    enum: ['D', 'I', 'M', 'N', 'P', 'S', 'U', 'X', '1', '2', '3']
+    description: >
+      Issuer CVC check response code:
+        * D - Transaction determined suspicious by issuing bank.
+        * I - Card verification number failed processor's data validation check.
+        * M - Card verification number matched.
+        * N - Card verification number not matched.
+        * P - Card verification number not processed by processor for unspecified reason.
+        * S - Card verification number is on the card but was not included in the request.
+        * U - Card verification is not supported by the issuing bank.
+        * X - Card verification is not supported by the card association.
+        * 1 - Card verification is not supported for this processor or card type.
+        * 2 - Unrecognized result code returned by processor for card verification response.
+        * 3 - No result code returned by processor.
+  CCExpire:
+    type: string
+    format: date
+    description: 'Credit card expiry date, full-date notation as per RFC 3339'
+    example: '2017-07-21'
+    x-nullable: true
+  CCIssue:
+    type: integer
+    minimum: 1
+    maximum: 99
+    description: 'Credit card issue number'
+    example: 1
+  CCHolderName:
+    type: string
+    minLength: 1
+    maxLength: 40
+    description: 'Cardholder name'
+    example: 'N E BODY'
+  CCNumber:
+    type: string
+    minLength: 14
+    maxLength: 40
+    description: 'Primary Account Number (will be sanitised in all output)'
+    example: '4111 1111 1111 1111'
+  CCStart:
+    type: string
+    format: date
+    description: 'Credit card start date, full-date notation as per RFC 3339'
+    example: '2017-07-21'
+    x-nullable: true
+  CCType:
+    type: string
+    maxLength: 20
+    description: 'Card type'
+    example: 'Visa'
+  ConversionRate:
+    type: number
+    format: float
+    minimum: 0
+    exclusiveMinimum: true
+    description: 'Currency transformation ration between currency and dccCurrency'
+    example: 0.892
+  Currency:
+    type: string
+    minLength: 3
+    maxLength: 4
+    description: 'ISO 4217 currency code'
+    example: 'GBP'
+  DeviceId:
+    type: string
+    maxLength: 32
+    description: 'EFTPOS device ID'
+    example: 'DX01234124-1241240-1231'
+  DeviceSerial:
+    type: string
+    description: 'EFTPOS device serial number'
+    example: '123-456-789'
+  DeviceModel:
+    type: string
+    description: 'EFTPOS device model number'
+    example: 'MX 915'
+  DeviceDescription:
+    type: string
+    description: 'EFTPOS device description'
+    example: 'Main device for location AB123'
+  DeviceIdleMessage:
+    type: string
+    description: 'EFTPOS message to display while idle'
+    example: 'Honest John Car Rental'
+  DeviceActivationCode:
+    type: string
+    description: 'Activation code for the EFTPOS device'
+    example: 'X123456'
+  EventID:
+    type: string
+    format: uuid
+    description: 'Transaction event reference (internal)'
+    example: '0173c58c-f772-41b8-bdd9-3c150abe2356'
+  HelpText:
+    type: string
+    maxLength: 64
+    description: 'A more detailed explanation of the response from the bank'
+    example: 'The Transaction was approved'
+  LaneId:
+    type: string
+    description: 'Lane identifier <location>-<index>'
+    example: 'ABC31-2'
+  Location:
+    type: string
+    maxLength: 32
+    description: 'Location of the client branch of the rental'
+    example: 'GBR-RAC-0123'
+  MerchantName:
+    type: string
+    maxLength: 64
+    description: 'Merchant name'
+    example: 'thermeon'
+  MerchantNumber:
+    type: integer
+    description: 'Merchant number'
+    example: 12345678
+  MerchantRef:
+    type: string
+    maxLength: 64
+    description: 'Merchant transaction reference'
+    example: 'Q032545'
+  MerchantRefType:
+    type: string
+    maxLength: 16
+    description: 'Merchant transaction type'
+    example: 'RES'
+  MerchantUser:
+    type: string
+    maxLength: 16
+    description: 'Merchant username'
+    example: 'bob34'
+  OptionLine:
+    type: string
+    description: 'Option description line'
+  Option:
+    type: object
+    properties:
+      name:
+        type: string
+        description: 'Option name'
+        example: 'B1'
+      value:
+        type: string
+        description: 'Option value'
+        example: 'YES'
+    description: 'Approval option text'
+  POSId:
+    type: string
+    maxLength: 32
+    description: 'Point of Sale device ID'
+    example: 'TEL-00'
+  RebillToken:
+    type: string
+    maxLength: 128
+    description: 'Tokenized PAN provided by service providers, along with adapter name'
+    example: "iveri|20E5E52BA01B5285CBC13D435EC788C6BD875FE434E2B075A2C32F8EE8CA5688AD"
+  ReceiptText:
+    type: string
+    description: 'Receipt text, if this is populated without being Complete then it requires approval'
+    example: 'Thermeon                   Vantage House              Mid Street                                            *---------EFTPOS----------*MERCHANT          123456789TERMINAL           1234567826 Jul 19 14:32            MASTERCARD            SWIPECARD       ************1114AUTHORISATION        002830REFERENCE            000812AUTH              GBP123.45TOTAL             GBP123.45                                   AUTHORISED                                         PLEASE SIGN BELOW                                                                                                                 *-------------------------*       MERCHANT COPY                                         PLEASE RETAIN            FOR YOUR RECORDS'
+  ReceiptWidth:
+    type: integer
+    description: 'Width of receipt lines, used to format ReceiptText for printing'
+    example: 80
+  ResponseCode:
+    type: string
+    minLength: 2
+    maxLength: 2
+    description: 'Response code'
+    example: '00'
+  ResponseText:
+    type: string
+    maxLength: 64
+    description: 'Response code description'
+    example: 'APPROVED'
+  SettleDate:
+    type: string
+    format: date
+    description: 'Expected date of settlement, full-date notation as per RFC 3339'
+    example: '2017-07-21'
+    x-nullable: true
+  TxnComplete:
+    type: boolean
+    description: 'Transaction is complete'
+    example: true
+  TxnDate:
+    type: string
+    format: date-time
+    description: 'Transaction date, full-date notation as per RFC 3339'
+    example: '2017-07-21T15:04:05Z'
+    x-nullable: true
+  TxnProcessor:
+    type: string
+    maxLength: 32
+    description: 'Transaction processor'
+    example: 'Payment Express'
+  TxnReference:
+    type: string
+    format: uuid
+    description: 'Transaction reference (internal)'
+    example: '0173c58c-f772-41b8-bdd9-3c150abe2356'
+  TxnReferenceExternal:
+    type: string
+    maxLength: 40
+    description: 'Transaction reference (external)'
+    example: '292732.287654448218'
+  TxnType:
+    type: string
+    enum: ['auth', 'capture', 'refund', 'sale', 'void']
+    description: 'Transaction type'

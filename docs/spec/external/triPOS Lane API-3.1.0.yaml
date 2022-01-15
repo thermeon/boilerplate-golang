@@ -1,0 +1,1279 @@
+swagger: '2.0'
+info:
+  title: triPOS Lane API
+  version: '3.1.0'
+host: triposcert.vantiv.com
+basePath: /cloudapi
+schemes:
+  - https
+paths:
+  /v1/lanes:
+    get:
+      consumes: []
+      produces:
+        - application/json
+        - text/json
+      parameters:
+        - description: The ID of the business application.
+          in: header
+          name: tp-application-id
+          required: true
+          type: string
+        - description: The name of the business application.
+          in: header
+          name: tp-application-name
+          required: true
+          type: string
+        - description: The version of the business application.
+          in: header
+          name: tp-application-version
+          required: true
+          type: string
+        - description: The Express acceptorId.
+          in: header
+          name: tp-express-acceptor-id
+          required: true
+          type: string
+        - description: The Express accountId.
+          in: header
+          name: tp-express-account-id
+          required: true
+          type: string
+        - description: The Express accountToken.
+          in: header
+          name: tp-express-account-token
+          required: true
+          type: string
+        - description: A unique ID for this request. This value should be a UUID or GUID.
+          in: header
+          name: tp-request-id
+          required: true
+          type: string
+        - default: application/json
+          description: Content type for request.
+          in: header
+          name: Content-Type
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Valid request.
+          schema:
+            items:
+              $ref: '#/definitions/LaneDto'
+            type: array
+        '400':
+          description: Invalid fields on request.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+        '401':
+          description: >-
+            Returned if the AcceptorId, AccountId, and AccountToken provided in
+            the HTTP request header are invalid.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+        '500':
+          description: Returned if an error occurred processing the request.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+      tags:
+        - Lanes
+      description: >-
+        Use this endpoint to see all the lanes currently associated with your
+        account.
+      operationId: Lanes_GetList
+      summary: Return a list of lane information
+    post:
+      consumes:
+        - application/json
+        - text/json
+        - application/x-www-form-urlencoded
+      produces:
+        - application/json
+        - text/json
+      parameters:
+        - description: The lane information
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: '#/definitions/LaneRequest'
+        - description: The ID of the business application.
+          in: header
+          name: tp-application-id
+          required: true
+          type: string
+        - description: The name of the business application.
+          in: header
+          name: tp-application-name
+          required: true
+          type: string
+        - description: The version of the business application.
+          in: header
+          name: tp-application-version
+          required: true
+          type: string
+        - description: The Express acceptorId.
+          in: header
+          name: tp-express-acceptor-id
+          required: true
+          type: string
+        - description: The Express accountId.
+          in: header
+          name: tp-express-account-id
+          required: true
+          type: string
+        - description: The Express accountToken.
+          in: header
+          name: tp-express-account-token
+          required: true
+          type: string
+        - description: A unique ID for this request. This value should be a UUID or GUID.
+          in: header
+          name: tp-request-id
+          required: true
+          type: string
+        - default: application/json
+          description: Content type for request.
+          in: header
+          name: Content-Type
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Valid request.
+          schema:
+            $ref: '#/definitions/LaneDto'
+        '400':
+          description: Invalid fields on request.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+        '401':
+          description: >-
+            Returned if the AcceptorId, AccountId, and AccountToken provided in
+            the HTTP request header are invalid.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+        '500':
+          description: Returned if an error occurred processing the request.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+      tags:
+        - Lanes
+      description: "Use this endpoint to add a new lane to your account. An activation code should be displayed on the PIN pad you are trying to associate.\r\nThe intention is that the end user initiates the pairing by taking the activation code and entering it into the point of sale application.\r\n<a href=\"https://triposcert.vantiv.com/api/help/kb/cloud/LaneRequest-Post.html\">more»</a>"
+      operationId: Lanes_Post
+      summary: Create lane
+  '/v1/lanes/{laneId}':
+    delete:
+      consumes: []
+      produces:
+        - application/json
+        - text/json
+      parameters:
+        - description: The lane ID.
+          format: int32
+          in: path
+          name: laneId
+          required: true
+          type: integer
+        - description: The ID of the business application.
+          in: header
+          name: tp-application-id
+          required: true
+          type: string
+        - description: The name of the business application.
+          in: header
+          name: tp-application-name
+          required: true
+          type: string
+        - description: The version of the business application.
+          in: header
+          name: tp-application-version
+          required: true
+          type: string
+        - description: The Express acceptorId.
+          in: header
+          name: tp-express-acceptor-id
+          required: true
+          type: string
+        - description: The Express accountId.
+          in: header
+          name: tp-express-account-id
+          required: true
+          type: string
+        - description: The Express accountToken.
+          in: header
+          name: tp-express-account-token
+          required: true
+          type: string
+        - description: A unique ID for this request. This value should be a UUID or GUID.
+          in: header
+          name: tp-request-id
+          required: true
+          type: string
+        - default: application/json
+          description: Content type for request.
+          in: header
+          name: Content-Type
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Valid request.
+        '400':
+          description: Invalid fields on request.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+        '401':
+          description: >-
+            Returned if the AcceptorId, AccountId, and AccountToken provided in
+            the HTTP request header are invalid.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+        '404':
+          description: Lane not found.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+        '500':
+          description: Returned if an error occurred processing the request.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+      tags:
+        - Lanes
+      description: >-
+        Use this endpoint to delete a lane from your account. If currently
+        connected, the connection to triPOS will be closed and a new activation
+        code will be displayed.
+      operationId: Lanes_Delete
+      summary: ''
+    get:
+      consumes: []
+      produces:
+        - application/json
+        - text/json
+      parameters:
+        - description: The lane ID.
+          format: int32
+          in: path
+          name: laneId
+          required: true
+          type: integer
+        - description: The ID of the business application.
+          in: header
+          name: tp-application-id
+          required: true
+          type: string
+        - description: The name of the business application.
+          in: header
+          name: tp-application-name
+          required: true
+          type: string
+        - description: The version of the business application.
+          in: header
+          name: tp-application-version
+          required: true
+          type: string
+        - description: The Express acceptorId.
+          in: header
+          name: tp-express-acceptor-id
+          required: true
+          type: string
+        - description: The Express accountId.
+          in: header
+          name: tp-express-account-id
+          required: true
+          type: string
+        - description: The Express accountToken.
+          in: header
+          name: tp-express-account-token
+          required: true
+          type: string
+        - description: A unique ID for this request. This value should be a UUID or GUID.
+          in: header
+          name: tp-request-id
+          required: true
+          type: string
+        - default: application/json
+          description: Content type for request.
+          in: header
+          name: Content-Type
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Valid request.
+          schema:
+            $ref: '#/definitions/LaneDto'
+        '400':
+          description: Invalid fields on request.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+        '401':
+          description: >-
+            Returned if the AcceptorId, AccountId, and AccountToken provided in
+            the HTTP request header are invalid.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+        '404':
+          description: Lane not found.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+        '500':
+          description: Returned if an error occurred processing the request.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+      tags:
+        - Lanes
+      description: Use this endpoint to see information for a specific lane.
+      operationId: Lanes_Get
+      summary: Retrieve specific lane information
+    patch:
+      consumes:
+        - application/json
+        - text/json
+        - application/x-www-form-urlencoded
+      produces:
+        - application/json
+        - text/json
+      parameters:
+        - description: The lane information
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: '#/definitions/LaneUpdateConfigurationRequest'
+        - description: The lane ID.
+          format: int32
+          in: path
+          name: laneId
+          required: true
+          type: integer
+        - description: The ID of the business application.
+          in: header
+          name: tp-application-id
+          required: true
+          type: string
+        - description: The name of the business application.
+          in: header
+          name: tp-application-name
+          required: true
+          type: string
+        - description: The version of the business application.
+          in: header
+          name: tp-application-version
+          required: true
+          type: string
+        - description: The Express acceptorId.
+          in: header
+          name: tp-express-acceptor-id
+          required: true
+          type: string
+        - description: The Express accountId.
+          in: header
+          name: tp-express-account-id
+          required: true
+          type: string
+        - description: The Express accountToken.
+          in: header
+          name: tp-express-account-token
+          required: true
+          type: string
+        - description: A unique ID for this request. This value should be a UUID or GUID.
+          in: header
+          name: tp-request-id
+          required: true
+          type: string
+        - default: application/json
+          description: Content type for request.
+          in: header
+          name: Content-Type
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Valid request.
+          schema:
+            $ref: '#/definitions/LaneUpdateConfigurationResponse'
+        '400':
+          description: Invalid fields on request.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+        '401':
+          description: >-
+            Returned if the AcceptorId, AccountId, and AccountToken provided in
+            the HTTP request header are invalid.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+        '500':
+          description: Returned if an error occurred processing the request.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+      tags:
+        - Lanes
+      description: "Use this endpoint to update configuration for a specific lane.\r\n<a href=\"https://triposcert.vantiv.com/api/help/kb/cloud/LaneRequest-Patch.html\">more»</a>"
+      operationId: Lanes_Patch
+      summary: Update lane Configuration
+  '/v1/lanes/{laneId}/activationCode':
+    post:
+      consumes: []
+      produces:
+        - application/json
+        - text/json
+      parameters:
+        - description: The lane ID.
+          format: int32
+          in: path
+          name: laneId
+          required: true
+          type: integer
+        - description: The ID of the business application.
+          in: header
+          name: tp-application-id
+          required: true
+          type: string
+        - description: The name of the business application.
+          in: header
+          name: tp-application-name
+          required: true
+          type: string
+        - description: The version of the business application.
+          in: header
+          name: tp-application-version
+          required: true
+          type: string
+        - description: The Express acceptorId.
+          in: header
+          name: tp-express-acceptor-id
+          required: true
+          type: string
+        - description: The Express accountId.
+          in: header
+          name: tp-express-account-id
+          required: true
+          type: string
+        - description: The Express accountToken.
+          in: header
+          name: tp-express-account-token
+          required: true
+          type: string
+        - description: A unique ID for this request. This value should be a UUID or GUID.
+          in: header
+          name: tp-request-id
+          required: true
+          type: string
+        - default: application/json
+          description: Content type for request.
+          in: header
+          name: Content-Type
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Valid request.
+          schema:
+            $ref: '#/definitions/ActivationCodeDto'
+        '400':
+          description: Invalid fields on request.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+        '401':
+          description: >-
+            Returned if the AcceptorId, AccountId, and AccountToken provided in
+            the HTTP request header are invalid.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+        '404':
+          description: Lane not found.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+        '500':
+          description: Returned if an error occurred processing the request.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+      tags:
+        - Lanes
+      description: >-
+        Use this endpoint to generate a new activation code for your PIN pad.
+        This allows for additional merchants to be associated with the PIN pad.
+      operationId: Lanes_ActivationCode
+      summary: Generate a new activation code
+  '/v1/lanes/{laneId}/command':
+    post:
+      consumes:
+        - application/json
+        - text/json
+        - application/x-www-form-urlencoded
+      produces:
+        - application/json
+        - text/json
+      parameters:
+        - description: The lane ID.
+          format: int32
+          in: path
+          name: laneId
+          required: true
+          type: integer
+        - description: >-
+            Command includes three options: <br />• ‘reinitialize’, to
+            reinitialize a PIN pad.<br />• ‘multiaid’, to configure the AID
+            prompts on PIN pad device. Value of deviceConfiguration parameter
+            should be set to ‘isDisplayCustomAidScreen’.<br />• ‘reboottime’, to
+            set the reboot time (in UTC 00:00:00 format) of PCIv4 PIN pads.
+            Value of deviceConfiguration parameter should be set to
+            ‘reboottime’.
+          in: query
+          name: cmd
+          required: true
+          type: string
+        - description: 'Set the device reboot time, Custom form for Aid Selection'
+          in: body
+          name: deviceConfiguration
+          required: true
+          schema:
+            $ref: '#/definitions/DeviceConfigurationRequest'
+        - description: The ID of the business application.
+          in: header
+          name: tp-application-id
+          required: true
+          type: string
+        - description: The name of the business application.
+          in: header
+          name: tp-application-name
+          required: true
+          type: string
+        - description: The version of the business application.
+          in: header
+          name: tp-application-version
+          required: true
+          type: string
+        - description: The Express acceptorId.
+          in: header
+          name: tp-express-acceptor-id
+          required: true
+          type: string
+        - description: The Express accountId.
+          in: header
+          name: tp-express-account-id
+          required: true
+          type: string
+        - description: The Express accountToken.
+          in: header
+          name: tp-express-account-token
+          required: true
+          type: string
+        - description: A unique ID for this request. This value should be a UUID or GUID.
+          in: header
+          name: tp-request-id
+          required: true
+          type: string
+        - default: application/json
+          description: Content type for request.
+          in: header
+          name: Content-Type
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Valid request.
+          schema:
+            $ref: '#/definitions/LaneDto'
+        '400':
+          description: Invalid fields on request.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+        '401':
+          description: >-
+            Returned if the AcceptorId, AccountId, and AccountToken provided in
+            the HTTP request header are invalid.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+        '404':
+          description: Lane not found.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+        '500':
+          description: Returned if an error occurred processing the request.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+      tags:
+        - Command
+      description: Use this endpoint to reconfigure PIN pad.
+      operationId: Command_Command
+  '/v1/lanes/{laneId}/connectionstatus':
+    get:
+      consumes: []
+      produces:
+        - application/json
+        - text/json
+      parameters:
+        - description: ''
+          format: int32
+          in: path
+          name: laneId
+          required: true
+          type: integer
+        - description: The ID of the business application.
+          in: header
+          name: tp-application-id
+          required: true
+          type: string
+        - description: The name of the business application.
+          in: header
+          name: tp-application-name
+          required: true
+          type: string
+        - description: The version of the business application.
+          in: header
+          name: tp-application-version
+          required: true
+          type: string
+        - description: The Express acceptorId.
+          in: header
+          name: tp-express-acceptor-id
+          required: true
+          type: string
+        - description: The Express accountId.
+          in: header
+          name: tp-express-account-id
+          required: true
+          type: string
+        - description: The Express accountToken.
+          in: header
+          name: tp-express-account-token
+          required: true
+          type: string
+        - description: A unique ID for this request. This value should be a UUID or GUID.
+          in: header
+          name: tp-request-id
+          required: true
+          type: string
+        - default: application/json
+          description: Content type for request.
+          in: header
+          name: Content-Type
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Valid request.
+          schema:
+            $ref: '#/definitions/ConnectionStatusDto'
+        '400':
+          description: Invalid fields on request.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+        '401':
+          description: >-
+            Returned if the AcceptorId, AccountId, and AccountToken provided in
+            the HTTP request header are invalid.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+        '404':
+          description: Lane not found.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+        '503':
+          description: Returned if a resource is not availabe.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+      tags:
+        - ConnectionStatus
+      description: >-
+        Use this endpoint to see the connection status for a specific lane. Note
+        that the triPOS Cloud environment obtains a snapshot of the PIN pad
+        status every 75 seconds via GET/v1/lanes/{laneId}/connectionstatus
+        endpoint. This endpoint does not connect to the PIN pad in real-time and
+        any updates to the status of the PIN pad may take up to 75 seconds to be
+        reflected in the status returned by the endpoint.
+      operationId: ConnectionStatus_ConnectionStatus
+  '/v1/lanes/{laneId}/connectionstatus/history':
+    get:
+      consumes: []
+      produces:
+        - application/json
+        - text/json
+      parameters:
+        - description: ''
+          format: int32
+          in: path
+          name: laneId
+          required: true
+          type: integer
+        - description: Default is set to 100.
+          format: int32
+          in: query
+          name: limit
+          required: false
+          type: integer
+        - description: The ID of the business application.
+          in: header
+          name: tp-application-id
+          required: true
+          type: string
+        - description: The name of the business application.
+          in: header
+          name: tp-application-name
+          required: true
+          type: string
+        - description: The version of the business application.
+          in: header
+          name: tp-application-version
+          required: true
+          type: string
+        - description: The Express acceptorId.
+          in: header
+          name: tp-express-acceptor-id
+          required: true
+          type: string
+        - description: The Express accountId.
+          in: header
+          name: tp-express-account-id
+          required: true
+          type: string
+        - description: The Express accountToken.
+          in: header
+          name: tp-express-account-token
+          required: true
+          type: string
+        - description: A unique ID for this request. This value should be a UUID or GUID.
+          in: header
+          name: tp-request-id
+          required: true
+          type: string
+        - default: application/json
+          description: Content type for request.
+          in: header
+          name: Content-Type
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Valid request.
+          schema:
+            items:
+              $ref: '#/definitions/ConnectionStatusDto'
+            type: array
+        '400':
+          description: Invalid fields on request.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+        '401':
+          description: >-
+            Returned if the AcceptorId, AccountId, and AccountToken provided in
+            the HTTP request header are invalid.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+        '404':
+          description: Lane not found.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+        '503':
+          description: Returned if a resource is not availabe.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+      tags:
+        - ConnectionStatus
+      description: Use this endpoint to see the connection history for a specific lane.
+      operationId: ConnectionStatus_History
+  '/v1/lanes/{laneId}/profiles/idle':
+    get:
+      consumes: []
+      produces:
+        - application/json
+        - text/json
+      parameters:
+        - description: The lane ID.
+          format: int32
+          in: path
+          name: laneId
+          required: true
+          type: integer
+        - description: The ID of the business application.
+          in: header
+          name: tp-application-id
+          required: true
+          type: string
+        - description: The name of the business application.
+          in: header
+          name: tp-application-name
+          required: true
+          type: string
+        - description: The version of the business application.
+          in: header
+          name: tp-application-version
+          required: true
+          type: string
+        - description: The Express acceptorId.
+          in: header
+          name: tp-express-acceptor-id
+          required: true
+          type: string
+        - description: The Express accountId.
+          in: header
+          name: tp-express-account-id
+          required: true
+          type: string
+        - description: The Express accountToken.
+          in: header
+          name: tp-express-account-token
+          required: true
+          type: string
+        - description: A unique ID for this request. This value should be a UUID or GUID.
+          in: header
+          name: tp-request-id
+          required: true
+          type: string
+        - default: application/json
+          description: Content type for request.
+          in: header
+          name: Content-Type
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Valid request.
+          schema:
+            $ref: '#/definitions/ProfileDto'
+        '400':
+          description: Invalid fields on request.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+        '401':
+          description: >-
+            Returned if the AcceptorId, AccountId, and AccountToken provided in
+            the HTTP request header are invalid.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+        '404':
+          description: Lane not found.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+        '500':
+          description: Returned if an error occurred processing the request.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+      tags:
+        - Profiles
+      description: Use this endpoint to see information for a specific lane.
+      operationId: Profiles_IdleProfile
+      summary: Retrieve specific lane idle profile
+    put:
+      consumes:
+        - application/json
+        - text/json
+        - application/x-www-form-urlencoded
+      produces:
+        - application/json
+        - text/json
+      parameters:
+        - description: ''
+          format: int32
+          in: path
+          name: laneId
+          required: true
+          type: integer
+        - description: The configuration profile information
+          in: body
+          name: idleMessageRequest
+          required: true
+          schema:
+            $ref: '#/definitions/ProfileIdleMessageRequest'
+        - description: The ID of the business application.
+          in: header
+          name: tp-application-id
+          required: true
+          type: string
+        - description: The name of the business application.
+          in: header
+          name: tp-application-name
+          required: true
+          type: string
+        - description: The version of the business application.
+          in: header
+          name: tp-application-version
+          required: true
+          type: string
+        - description: The Express acceptorId.
+          in: header
+          name: tp-express-acceptor-id
+          required: true
+          type: string
+        - description: The Express accountId.
+          in: header
+          name: tp-express-account-id
+          required: true
+          type: string
+        - description: The Express accountToken.
+          in: header
+          name: tp-express-account-token
+          required: true
+          type: string
+        - description: A unique ID for this request. This value should be a UUID or GUID.
+          in: header
+          name: tp-request-id
+          required: true
+          type: string
+        - default: application/json
+          description: Content type for request.
+          in: header
+          name: Content-Type
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Valid request.
+        '400':
+          description: Invalid fields on request.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+        '401':
+          description: >-
+            Returned if the AcceptorId, AccountId, and AccountToken provided in
+            the HTTP request header are invalid.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+        '404':
+          description: Lane not found.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+        '500':
+          description: Returned if an error occurred processing the request.
+          schema:
+            $ref: '#/definitions/ExceptionDto'
+      tags:
+        - Profiles
+      operationId: Profiles_Put
+      summary: Used to update the PIN pad idle message
+  '/v1/lanes/{laneId}/rebootTime':
+    get:
+      consumes: []
+      produces:
+        - application/json
+        - text/json
+      parameters:
+        - format: int32
+          in: path
+          name: laneId
+          required: true
+          type: integer
+        - description: The ID of the business application.
+          in: header
+          name: tp-application-id
+          required: true
+          type: string
+        - description: The name of the business application.
+          in: header
+          name: tp-application-name
+          required: true
+          type: string
+        - description: The version of the business application.
+          in: header
+          name: tp-application-version
+          required: true
+          type: string
+        - description: The Express acceptorId.
+          in: header
+          name: tp-express-acceptor-id
+          required: true
+          type: string
+        - description: The Express accountId.
+          in: header
+          name: tp-express-account-id
+          required: true
+          type: string
+        - description: The Express accountToken.
+          in: header
+          name: tp-express-account-token
+          required: true
+          type: string
+        - description: A unique ID for this request. This value should be a UUID or GUID.
+          in: header
+          name: tp-request-id
+          required: true
+          type: string
+        - default: application/json
+          description: Content type for request.
+          in: header
+          name: Content-Type
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/LaneDto'
+      tags:
+        - RebootTime
+      operationId: RebootTime_GetRebootTimeAsync
+definitions:
+  AccountHeaderRequestValues:
+    properties:
+      acceptorId:
+        type: string
+      accountId:
+        format: int32
+        type: integer
+      accountToken:
+        type: string
+      commandId:
+        example: 00000000-0000-0000-0000-000000000000
+        format: uuid
+        type: string
+      requestId:
+        example: 00000000-0000-0000-0000-000000000000
+        format: uuid
+        type: string
+    type: object
+  ActivationCodeDto:
+    properties:
+      activationCode:
+        type: string
+      expirationDateTime:
+        format: date-time
+        type: string
+    type: object
+  ConnectionStatusDto:
+    properties:
+      status:
+        type: string
+      timeStamp:
+        format: date-time
+        type: string
+    type: object
+  DeleteLaneResponse:
+    properties:
+      _links:
+        items:
+          $ref: '#/definitions/LinkDto'
+        type: array
+      laneDeleted:
+        type: boolean
+    type: object
+  DeviceConfigurationRequest:
+    properties:
+      isDisplayCustomAidScreen:
+        type: boolean
+      rebootTime:
+        type: string
+    required:
+      - rebootTime
+    type: object
+  ExceptionDto:
+    properties:
+      exceptionMessage:
+        type: string
+    type: object
+  IdleImageDto:
+    properties:
+      url:
+        type: string
+    type: object
+  LaneDto:
+    properties:
+      _links:
+        items:
+          $ref: '#/definitions/LinkDto'
+        type: array
+      applicationVersion1:
+        type: string
+      applicationVersion2:
+        type: string
+      certificateThumbprint:
+        type: string
+      connectionStatus:
+        $ref: '#/definitions/ConnectionStatusDto'
+      contactlessEmvEnabled:
+        description: 'A {System.Boolean} value indicating if Contactless EMV is enabled.'
+        type: boolean
+      contactlessMsdEnabled:
+        description: 'A {System.Boolean} value indicating if Contactless MSD is enabled.'
+        type: boolean
+      description:
+        type: string
+      emvKernelVersion:
+        type: string
+      laneId:
+        format: int32
+        type: integer
+      language:
+        type: string
+      modelNumber:
+        type: string
+      operatingSystemVersion:
+        type: string
+      processor:
+        type: string
+      profile:
+        $ref: '#/definitions/ProfileDto'
+      quickChipDataLifetime:
+        description: >-
+          A positive integer between 30 and 600 indicating the maximum lifetime
+          of pre-read data before expiration.
+        format: int32
+        type: integer
+      quickChipEnabled:
+        description: >-
+          A {System.Boolean} value indicating if the Quick Chip feature is
+          enabled.
+        type: boolean
+      rawDeviceInformation:
+        type: string
+      securityVersion:
+        type: string
+      serialNumber:
+        type: string
+      terminalId:
+        type: string
+    type: object
+  LaneRequest:
+    properties:
+      activationCode:
+        type: string
+      contactlessEmvEnabled:
+        description: "A Boolean value (true|false) that enables Contactless EMV, if supported.  \r\nThis feature is supported on Ingenico devices with RBA version equal or greater than 23.0.44."
+        type: string
+      contactlessMsdEnabled:
+        description: "A Boolean value (true|false) that enables Contactless MSD, if supported.  \r\nThis feature is supported on Ingenico devices with RBA version less than 23.0.44."
+        type: string
+      description:
+        type: string
+      laneId:
+        format: int32
+        maximum: 999999
+        minimum: 1
+        type: integer
+      marketCode:
+        enum:
+          - 0
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+          - 6
+          - 7
+          - 8
+        format: int32
+        readOnly: true
+        type: integer
+      processor:
+        description: "A string value (Vantiv|VantivCanada) that enables settings on device for USA|CAN.  \r\nThis feature is supported on Ingenico Tetra Lane 3000 and Link 2500 devices."
+        type: string
+      quickChipDataLifetime:
+        description: "A positive integer between 30 and 600 indicating the number of seconds the pre-read.  \r\ndata will be stored for the Quick-Chip feature, if supported and enabled."
+        format: int32
+        maximum: 600
+        minimum: 30
+        type: integer
+      quickChipEnabled:
+        description: "A Boolean value (true|false) that enables Quick-Chip feature, if supported.  \r\nThis feature is supported on Ingenico devices with RBA version equal or greater than 23.0.44."
+        type: string
+      terminalId:
+        type: string
+    required:
+      - laneId
+      - terminalId
+      - activationCode
+    type: object
+  LaneUpdateConfigurationRequest:
+    properties:
+      contactlessEmvEnabled:
+        description: "A Boolean value (true|false) that enables Contactless EMV, if supported.  \r\nThis feature is supported on Ingenico devices with RBA version equal or greater than 23.0.44."
+        type: string
+      contactlessMsdEnabled:
+        description: "A Boolean value (true|false) that enables Contactless MSD, if supported.  \r\nThis feature is supported on Ingenico devices with RBA version less than 23.0.44."
+        type: string
+      language:
+        description: "A string value (English|French) that sets default lanugage on the device.  \r\nThis feature is supported on Canadian Ingenico Tetra Lane 3000 and Link 2500 devices."
+        type: string
+      quickChipDataLifetime:
+        description: "A positive integer between 30 and 600 indicating the number of seconds the pre-read.  \r\ndata will be stored for the Quick-Chip feature, if supported and enabled."
+        format: int32
+        maximum: 600
+        minimum: 30
+        type: integer
+      quickChipEnabled:
+        description: "A Boolean value (true|false) that enables Quick-Chip feature, if supported.  \r\nThis feature is supported on Ingenico devices with RBA version equal or greater than 23.0.44."
+        type: string
+    type: object
+  LaneUpdateConfigurationResponse:
+    properties:
+      _links:
+        items:
+          $ref: '#/definitions/LinkDto'
+        type: array
+      contactlessEmvEnabled:
+        type: string
+      contactlessMsdEnabled:
+        type: string
+      language:
+        type: string
+      quickChipDataLifetime:
+        format: int32
+        type: integer
+      quickChipEnabled:
+        type: string
+    type: object
+  LinkDto:
+    properties:
+      href:
+        type: string
+      method:
+        type: string
+      rel:
+        type: string
+    type: object
+  ProfileDto:
+    properties:
+      idleMessage:
+        type: string
+    type: object
+  ProfileIdleMessageRequest:
+    properties:
+      idleMessage:
+        type: string
+    required:
+      - idleMessage
+    type: object
+  UpdatePinPadProfileIdleResponse:
+    properties:
+      acceptorId:
+        type: string
+      accountId:
+        format: int32
+        type: integer
+      commandId:
+        example: 00000000-0000-0000-0000-000000000000
+        format: uuid
+        type: string
+      exceptionType:
+        type: string
+      idleImageFile:
+        type: string
+      idleImageUrl:
+        type: string
+      idleMessage:
+        type: string
+      laneId:
+        format: int32
+        type: integer
+      rawException:
+        type: string
+      requestId:
+        example: 00000000-0000-0000-0000-000000000000
+        format: uuid
+        type: string
+      responseType:
+        enum:
+          - 0
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+          - 6
+          - 7
+        format: int32
+        type: integer
+    type: object
+
